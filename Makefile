@@ -1,4 +1,4 @@
-SOURCEOBJS = polynom.cpp PolStr.o 
+SOURCEOBJS = spline.cpp PolStr.o 
 main :
 	g++ -o lab4 $(SOURCEOBJS) 
 main-debug :

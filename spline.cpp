@@ -6,41 +6,28 @@
 #include <stdexcept>
 #include <vector>
 using namespace std;
-void solve(double *y, int n, int, double*);
+void solve(double*, double *y, int n, int, double**);
 double eval(double *result, int n, double xres);
-double x(int i);
-int fact(int in);
-double *xx;
-string s; //e -- even, u -- uneven
 double a,b; //– границы отрезка (при равномерной сетке);
 double h;
 int main(int argc, char **argv) {
     try {
-        int k; // 0 – вычисляется сам полином, 1 – его первая производная, 2 – вторая производная
-        int n; //порядок полинома
+        int k; // порядок сплайна (1 – линейный, 2 – параболический, 3 – кубический)
+        int n; //количество сплайнов
         
         cin >> k >> n;
-        n++;
-        getline(cin,s);
-        getline(cin,s);
-        xx = new double[n];
-        double *y = new double[n];
-        if (s=="e") {
-            cin >> a >> b;
-            h=abs(a-b)/(n-1);
+        double *x = new double[n+1];
+        double *y = new double[n+1];
+        for (int i=0; i<n+1; i++) {
+            cin >> x[i];
         }
-        else {
-            for (int i=0; i<n; i++) {
-                cin >> xx[i];
-            }
-        }
-        for (int i=0; i<n; i++) {
+        for (int i=0; i<n+1; i++) {
             cin >> y[i];
         }
         int m; //количество интервалов в результирующей сетке (т.е. количество узлов – m + 1, что сделано для унификации с узлами исходной сетки);
         cin >> m;
-        double *xres = new double[m];
-        for (int i=0; i<m; i++) {
+        double *xres = new double[m+1];
+        for (int i=0; i<m+1; i++) {
             cin >> xres[i];
         }
         string t; //'y' -- expression known, 'n' -- otherwise
@@ -54,34 +41,33 @@ int main(int argc, char **argv) {
             sexpr_c=CreatePolStr(sexpr_c,0);
             
         }
-        double *result = new double[n];
-        solve(y,n,k,result);
-        double *resnum = new double[m];
-        for (int i=0; i<m; i++) {
+        double **result = new double*[n];
+        for (int i=0; i<n; i++) {
+            result[i] = new double[k+1];
+        }
+        solve(x,y,n,k,result);
+        double *resnum = new double[m+1];
+        for (int i=0; i<m+1; i++) {
         
             double resT=eval(result,n,xres[i]);
-            if(s=="e")
-            {
-                resT=eval(result,n,(xres[i]-a)/h);
-            }
             resnum[i] = resT;
             
-            cout << "x" << i << " P'(" << k << ")(" << xres[i] << ") = " << resT << endl;
+            cout << "x" << i << " P" << "(" << xres[i] << ") = " << resT << endl;
         }
         if (t=="y") {
-                double *resfuncnum = new double[m];
+                double *resfuncnum = new double[m+1];
                 double sum = 0;
-                for (int i=0; i<m; i++) {
+                for (int i=0; i<m+1; i++) {
                         resfuncnum[i]=EvalPolStr(sexpr_c,xres[i],k);
                         sum += sqrt(pow(resnum[i]-resfuncnum[i],2));
                 }
-                sum /= m;
+                sum /= m+1;
                 cout << "Deviation: " << sum << endl;
                 delete[] resfuncnum;
         }
         delete[] result;
         delete[] resnum;
-        delete[] xx;
+        delete[] x;
         delete[] y;
         delete[] xres;
     }
@@ -130,8 +116,15 @@ double findMultValue(int n, vector<int> &indexes, int k) {
     }
 }
 
-void solve(double *y, int n, int iDer, double *l) {
-    for (int k=0; k<n; k++) {
+void solve(double *x, double *y, int n, int k, double *l) {
+    if (k==1) {
+        for (int i=0; i<n; i++) {
+            l[i][1] = (y[i+1]-y[i])/(x[i+1]-x[i]);
+            l[i][0] = y[i]-l[i][1]*x[i];
+        }
+    }
+    return;
+    /*for (int k=0; k<n; k++) {
         l[k] = 0;
     }
     for (int i=0; i<n; i++) {
@@ -194,7 +187,7 @@ void solve(double *y, int n, int iDer, double *l) {
     for (int i=0; i<n; i++) {
         cout << l[i] <<' ';
     }
-    cout << endl;
+    cout << endl;*/
 }
 
 double eval(double *result, int n, double xres) {
@@ -203,17 +196,4 @@ double eval(double *result, int n, double xres) {
         sum += result[i]*pow(xres,n-1-i);
     }
     return sum;
-}
-double x(int i) {
-    if(s=="e")
-        return i;
-    else
-        return xx[i];
-}
-int fact(int in)
-{
-  int fact=1;
-  for (int c = 1; c <= in; c++)
-    fact = fact * c;
-  return fact;
 }
