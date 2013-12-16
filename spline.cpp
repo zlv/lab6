@@ -16,16 +16,15 @@ int main(int argc, char **argv) {
         cin >> k >> n;
         double *x = new double[n+1];
         double *y = new double[n+1];
+        double aI,aN;
         for (int i=0; i<n+1; i++) {
             cin >> x[i];
         }
         for (int i=0; i<n+1; i++) {
             cin >> y[i];
         }
-        double bI, bN;
-        if (k==3) {
-            cin >> bI >> bN;
-        }
+        if(k==2||k==3)
+            cin>>aI>>aN;
         int m; //количество интервалов в результирующей сетке (т.е. количество узлов – m + 1, что сделано для унификации с узлами исходной сетки);
         cin >> m;
         double *xres = new double[m+1];
@@ -47,13 +46,13 @@ int main(int argc, char **argv) {
         for (int i=0; i<n; i++) {
             result[i] = new double[k+1];
         }
-        solve(x,y,n,k,result,bI,bN);
+        solve(x,y,n,k,result,aI,aN);
         double *resnum = new double[m+1];
         for (int i=0; i<m+1; i++) {
         
+            cerr << "m" << m << endl;
             double resT=eval(x,result,n,k,xres[i]);
             resnum[i] = resT;
-            
             cout << "x" << i << " S" << "(" << xres[i] << ") = " << resT << endl;
         }
         if (t=="y") {
@@ -127,7 +126,7 @@ void findM(double *x, double *y, double *m, int n) {
     delete a;
 }
 
-void solve(double *x, double *y, int n, int k, double **l, double bI, double bN) {
+void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
     if (k==1) {
         for (int i=0; i<n; i++) {
             double a = y[i];
@@ -135,6 +134,35 @@ void solve(double *x, double *y, int n, int k, double **l, double bI, double bN)
             l[i][0] = b;
             l[i][1] = a-b*x[i];
             cout << a << ' ' << b << endl;
+        }
+    }
+    else if(k==2){
+        
+        int j=n;
+        double *b=new double[n+1];
+        bool zero=1;
+        if(bI==0.){
+            zero=0;
+            j=0;
+        }
+        b[j]=bN;
+//        cout<<n;
+        for(int i=0;i<n;i++) {
+        int ind=i-zero*(n);
+        int ip=abs(ind+1);
+        int im=abs(ind);
+        double delt=2*(y[ip-1]-y[im-1])/(x[ip-1]-x[im-1]);
+        b[ip]=delt-b[im];
+        cout<<ip<<' '<<im<<endl;
+        }
+        for (int i=0; i<n; i++) {
+            double a = y[i];
+            double bb = b[i];
+            double c = (b[i+1]-b[i])/2*(x[i+1]-x[i]);
+            l[i][0] = c;
+            l[i][1] = bb-2*c*x[i];
+            l[i][2] = a-bb*x[i]-c*x[i]*x[i];
+            cout << a << ' ' << bb << ' ' << c << endl;
         }
     }
     else if (k==3) {
