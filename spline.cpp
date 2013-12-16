@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <vector>
 using namespace std;
-void solve(double *x, double *y, int n, int k, double **l);
+void solve(double *x, double *y, int n, int k, double **l, double bI, double bN);
 double eval(double *x, double **result, int n, int k, double xres);
 int main(int argc, char **argv) {
     try {
@@ -21,6 +21,10 @@ int main(int argc, char **argv) {
         }
         for (int i=0; i<n+1; i++) {
             cin >> y[i];
+        }
+        double bI, bN;
+        if (k==3) {
+            cin >> bI >> bN;
         }
         int m; //количество интервалов в результирующей сетке (т.е. количество узлов – m + 1, что сделано для унификации с узлами исходной сетки);
         cin >> m;
@@ -43,7 +47,7 @@ int main(int argc, char **argv) {
         for (int i=0; i<n; i++) {
             result[i] = new double[k+1];
         }
-        solve(x,y,n,k,result);
+        solve(x,y,n,k,result,bI,bN);
         double *resnum = new double[m+1];
         for (int i=0; i<m+1; i++) {
         
@@ -79,7 +83,51 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void solve(double *x, double *y, int n, int k, double **l) {
+void tri_matrix_alg(int n, double **a, double *x, double *b) {
+    double *r = new double[n];
+    double *v = new double[n];
+    v[n-1] = a[n-1][n-1];
+    r[n-1] = b[n-1];
+    for (int i=n-2; i>=0; i--) {
+        v[i] = a[i][i]-a[i][i+1]*a[i+1][i]/v[i+1];
+        r[i] = b[i]-a[i][i+1]*r[i+1]/v[i+1];
+    }
+    for (int i=0; i<n; i++) {
+        double res = r[i];
+        if (i!=0) res -= a[i][i-1]*x[i-1];
+        x[i] = res/v[i];
+    }
+    delete[] v;
+    delete[] r;
+}
+
+void findM(double *x, double *y, double *m, int n) {
+    double **a = new double*[n-1];
+    double *g = new double[n-1];
+    for (int i=0; i<n-1; i++) {
+        a[i] = new double[n-1];
+    }
+    for (int i=0; i<n-1; i++) {
+        a[i][i] = (x[i+2]-x[i])/3;
+        if (i!=n-2)
+            a[i][i+1] = a[i+1][i] = (x[i+2]-x[i+1])/6;
+        g[i] = (y[i+2]-y[i+1])/(x[i+2]-x[i+1])-(y[i+1]-y[i])/(x[i+1]-x[i]);
+        if (i==0) {
+            g[i] -= m[i]*(x[i+1]-x[i])/6;
+        }
+        else if (i==n-2) {
+            g[i] -= m[i]*(x[n-1]-x[n-2])/6;
+        }
+    }
+    tri_matrix_alg(n-1,a,&m[1],g);
+    for (int i=0; i<n-1; i++) {
+        delete a[i];
+    }
+    delete g;
+    delete a;
+}
+
+void solve(double *x, double *y, int n, int k, double **l, double bI, double bN) {
     if (k==1) {
         for (int i=0; i<n; i++) {
             double a = y[i];
@@ -88,6 +136,25 @@ void solve(double *x, double *y, int n, int k, double **l) {
             l[i][1] = a-b*x[i];
             cout << a << ' ' << b << endl;
         }
+    }
+    else if (k==3) {
+        double *m = new double[n+1];
+        m[0] = bI;
+        m[n] = bN;
+        findM(x,y,m,n);
+        for (int i=0; i<n; i++) {
+            double dx = (x[i+1]-x[i]);
+            double a = y[i];
+            double b = (y[i+1]-y[i])/dx-dx*(2*m[i]+m[i+1])/6;
+            double c = m[i]/2;
+            double d = (m[i+1]-m[i])/6/dx;
+            l[i][0] = d;
+            l[i][1] = c-3*d*x[i];
+            l[i][2] = b-2*c*x[i]+3*d*pow(x[i],2);
+            l[i][3] = a-b*x[i]+c*pow(x[i],2)-d*pow(x[i],3);
+            cout << a << ' ' << b << ' ' << c << ' ' << d << endl;
+        }
+        delete[] m;
     }
 }
 
