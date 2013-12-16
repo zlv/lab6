@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <vector>
 using namespace std;
-void solve(double *x, double *y, int n, int k, double **l);
+void solve(double *x, double *y, int n, int k, double **l,double bI,double bN);
 double eval(double *x, double **result, int n, int k, double xres);
 int main(int argc, char **argv) {
     try {
@@ -16,12 +16,15 @@ int main(int argc, char **argv) {
         cin >> k >> n;
         double *x = new double[n+1];
         double *y = new double[n+1];
+        double aI,aN;
         for (int i=0; i<n+1; i++) {
             cin >> x[i];
         }
         for (int i=0; i<n+1; i++) {
             cin >> y[i];
         }
+        if(k==2||k==3)
+            cin>>aI>>aN;
         int m; //количество интервалов в результирующей сетке (т.е. количество узлов – m + 1, что сделано для унификации с узлами исходной сетки);
         cin >> m;
         double *xres = new double[m+1];
@@ -43,7 +46,8 @@ int main(int argc, char **argv) {
         for (int i=0; i<n; i++) {
             result[i] = new double[k+1];
         }
-        solve(x,y,n,k,result);
+        solve(x,y,n,k,result,aI,aN);
+        return 1;
         double *resnum = new double[m+1];
         for (int i=0; i<m+1; i++) {
         
@@ -79,7 +83,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void solve(double *x, double *y, int n, int k, double **l) {
+void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
     if (k==1) {
         for (int i=0; i<n; i++) {
             double a = y[i];
@@ -88,6 +92,37 @@ void solve(double *x, double *y, int n, int k, double **l) {
             l[i][1] = a-b*x[i];
             cout << a << ' ' << b << endl;
         }
+    }
+    if(k==2){
+        
+        int j=n;
+        double *b=new double[n];
+        bool zero=1;
+        if(bI==0.){
+            zero=0;
+            j=0;
+        }
+        b[j]=bN;
+//        cout<<n;
+        for(int i=0;i<n;i++) {
+        int ind=i-zero*(n);
+        int ip=abs(ind+1);
+        int im=abs(ind);
+        double delt=2*(y[ip]-y[im])/(x[ip]-x[im]);
+//            b[abs(i-zero*(n-1))]=2*y[i+1]-y[i])/(x[i+1]-x[i])-b[abs(i+1-zero*(n-1))
+        b[ip]=delt-b[im];
+        cout<<ip<<' '<<im<<endl;
+        }
+        for (int i=0; i<n; i++) {
+            double a = y[i];
+            double bb = b[i];
+            double c = (b[i+1]-b[i])/2*(x[i+1]-x[i]);
+            l[i][0] = c;
+            l[i][1] = bb-c*x[i]*x[i];
+            l[i][2] = a-bb*x[i]-c*x[i]*x[i];
+            cout << a << ' ' << bb << ' ' << c << endl;
+        }
+        
     }
 }
 
