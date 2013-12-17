@@ -151,9 +151,11 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
         int ind=i-zero*(n);
         int ip=abs(ind+1);
         int im=abs(ind);
-        double delt=2*(y[ip-1]-y[im-1])/(x[ip-1]-x[im-1]);
+        double delt=2*(y[ip]-y[im])/(x[ip]-x[im]);
+        
         b[ip]=delt-b[im];
-        cout<<ip<<' '<<im<<endl;
+        cout<<endl<<b[ip]<<' '<<y[ip]-y[im]<<' '<<x[ip]-x[im]<<endl;
+  //      cout<<ip<<' '<<im<<endl;
         }
         for (int i=0; i<n; i++) {
             double a = y[i];
@@ -161,8 +163,7 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
             double c = (b[i+1]-b[i])/2/(x[i+1]-x[i]);
             l[i][0] = c;
             l[i][1] = bb-2*c*x[i];
-            l[i][2] = a-bb*x[i]-c*x[i]*x[i];
-            cout << a << ' ' << bb << ' ' << c << endl;
+            l[i][2] = a-bb*x[i]+c*x[i]*x[i];
         }
         delete[] b;
     }
