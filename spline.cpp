@@ -141,7 +141,7 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
         int j=n;
         double *b=new double[n+1];
         bool zero=1;
-        if(bI==0.){
+        if(int(bI)==0){
             zero=0;
             j=0;
         }
@@ -158,12 +158,13 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
         for (int i=0; i<n; i++) {
             double a = y[i];
             double bb = b[i];
-            double c = (b[i+1]-b[i])/2*(x[i+1]-x[i]);
+            double c = (b[i+1]-b[i])/2/(x[i+1]-x[i]);
             l[i][0] = c;
             l[i][1] = bb-2*c*x[i];
             l[i][2] = a-bb*x[i]-c*x[i]*x[i];
             cout << a << ' ' << bb << ' ' << c << endl;
         }
+        delete[] b;
     }
     else if (k==3) {
         double *m = new double[n+1];
