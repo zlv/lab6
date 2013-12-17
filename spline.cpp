@@ -47,10 +47,15 @@ int main(int argc, char **argv) {
             result[i] = new double[k+1];
         }
         solve(x,y,n,k,result,aI,aN);
+        for (int i=0; i<n; i++) {
+            cerr << i << ") ";
+            for (int j=0; j<k+1; j++) {
+                cerr << result[i][j] << ' ';
+            }
+            cerr << "; " << x[i] << " <= x <= " << x[i+1] << endl;
+        }
         double *resnum = new double[m+1];
         for (int i=0; i<m+1; i++) {
-        
-            cerr << "m" << m << endl;
             double resT=eval(x,result,n,k,xres[i]);
             resnum[i] = resT;
             cout << "x" << i << " S" << "(" << xres[i] << ") = " << resT << endl;
@@ -115,7 +120,7 @@ void findM(double *x, double *y, double *m, int n) {
             g[i] -= m[i]*(x[i+1]-x[i])/6;
         }
         else if (i==n-2) {
-            g[i] -= m[i]*(x[n-1]-x[n-2])/6;
+            g[i] -= m[n]*(x[n-1]-x[n-2])/6;
         }
     }
     tri_matrix_alg(n-1,a,&m[1],g);
@@ -133,7 +138,7 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
             double b = (y[i+1]-y[i])/(x[i+1]-x[i]);
             l[i][0] = b;
             l[i][1] = a-b*x[i];
-            cout << a << ' ' << b << endl;
+            cout << a << ' ' << b << "; " << x[i] << " <= x <= " << x[i+1] << endl;
         }
     }
     else if(k==2){
@@ -162,7 +167,7 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
             l[i][0] = c;
             l[i][1] = bb-2*c*x[i];
             l[i][2] = a-bb*x[i]-c*x[i]*x[i];
-            cout << a << ' ' << bb << ' ' << c << endl;
+            cout << a << ' ' << bb << ' ' << c << "; " << x[i] << " <= x <= " << x[i+1] << endl;
         }
         delete[] b;
     }
@@ -181,7 +186,7 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
             l[i][1] = c-3*d*x[i];
             l[i][2] = b-2*c*x[i]+3*d*pow(x[i],2);
             l[i][3] = a-b*x[i]+c*pow(x[i],2)-d*pow(x[i],3);
-            cout << a << ' ' << b << ' ' << c << ' ' << d << endl;
+            cout << a << ' ' << b << ' ' << c << ' ' << d << "; " << x[i] << " <= x <= " << x[i+1] << endl;
         }
         delete[] m;
     }
