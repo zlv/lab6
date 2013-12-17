@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
             strcpy(sexpr_c,sexpr.c_str());
             sexpr_c=CreatePolStr(sexpr_c,0);
             
+            
         }
         double **result = new double*[n];
         for (int i=0; i<n; i++) {
@@ -64,7 +65,7 @@ int main(int argc, char **argv) {
                 double *resfuncnum = new double[m+1];
                 double sum = 0;
                 for (int i=0; i<m+1; i++) {
-                        resfuncnum[i]=EvalPolStr(sexpr_c,xres[i],k);
+                        resfuncnum[i]=EvalPolStr(sexpr_c,xres[i],0);
                         sum += sqrt(pow(resnum[i]-resfuncnum[i],2));
                 }
                 sum /= m+1;
@@ -159,8 +160,6 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
         double delt=2*(y[ip]-y[im])/(x[ip]-x[im]);
         
         b[ip]=delt-b[im];
-        cout<<endl<<b[ip]<<' '<<y[ip]-y[im]<<' '<<x[ip]-x[im]<<endl;
-  //      cout<<ip<<' '<<im<<endl;
         }
         for (int i=0; i<n; i++) {
             double a = y[i];
@@ -169,6 +168,7 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
             l[i][0] = c;
             l[i][1] = bb-2*c*x[i];
             l[i][2] = a-bb*x[i]+c*x[i]*x[i];
+            cout << a << ' ' << bb << ' ' << c << "; " << x[i] << " <= x <= " << x[i+1] << endl;
         }
         delete[] b;
     }
