@@ -120,8 +120,8 @@ void findM(double *x, double *y, double *m, int n) {
         if (i==0) {
             g[i] -= m[i]*(x[i+1]-x[i])/6;
         }
-        else if (i==n-2) {
-            g[i] -= m[n]*(x[n-1]-x[n-2])/6;
+        if (i==n-2) {
+            g[i] -= m[n]*(x[n]-x[n-1])/6;
         }
     }
     tri_matrix_alg(n-1,a,&m[1],g);
@@ -176,7 +176,11 @@ void solve(double *x, double *y, int n, int k, double **l,double bI,double bN) {
         double *m = new double[n+1];
         m[0] = bI;
         m[n] = bN;
-        findM(x,y,m,n);
+        for (int i=0; i<n+1; i++)
+            cerr << m[i] << ' ';
+        cerr << endl;
+        if (n!=1)
+            findM(x,y,m,n);
         for (int i=0; i<n; i++) {
             double dx = (x[i+1]-x[i]);
             double a = y[i];
